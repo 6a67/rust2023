@@ -1,0 +1,110 @@
+\section{Structs in Rust}
+The core principle of structs in Rust is similar to the concept of a struct in \Cpp or basic classes in languages like Java.
+A struct groups multiple values of potentially different types into a single type and gives them a name.
+This allows for the creation of custom, more complex types.
+Rust differentiates between three types of structs: \textit{named structs}, \textit{tuple structs}, and \textit{unit structs}. \cite[Chapter~6.6]{rustref}
+
+
+\Needspace{15\baselineskip}
+\includecode{rust}{ressources/code/structsyntaxusage.rs}{Basic Syntax of a named struct in Rust}{structsyntaxusage}
+\subsection{Named Structs}
+Named structs consist of named fields, each of which can have a different type.
+Code \ref{code:structsyntaxusage} shows the basic syntax of defining a named struct using the \texttt{struct} keyword.
+The naming convention for structs in Rust is to use \mbox{\textit{PascalCase}} for the name of the struct and \mbox{\textit{snake\_case}} for the fields and methods of the struct \cite{rustapiguidelines}.
+A struct can be instantiated using a struct expression that follows the \texttt{StructName \{ field\_name1: value, field\_name2: value \}} syntax.
+If a variable name is the same as a field name, Rust allows for a shorter expression by using the \textit{field init shorthand} syntax \texttt{StructName \{ field\_name1, field\_name2 \}} instead \cite[RFC 1682]{rustrfc}.
+After instantiation, each field can be accessed using the \texttt{.} operator and its name \cite[Chapter~5.1]{rustbook}.
+Code \ref{code:structsyntaxusage} shows an example of the usage.
+\Needspace{15\baselineskip}
+\includecode[0.45]{rust}{ressources/code/structupdatesyntax.rs}{Struct update syntax in Rust}{structupdatesyntax}
+Rust allows for another shorthand syntax when instantiating a struct.
+Using the \texttt{..} operator, a new struct can be created from an existing one using the \textit{struct update} syntax.
+This will assign the fields of the new struct the same values as the fields of the existing struct.
+If the struct has fields that cannot be copied, the values of the old struct will be moved into the new struct, and the old struct will be invalidated.
+The \texttt{..} operator initializes the remaining fields and thus must be the last part of the struct expression \cite[Chapter~5.1]{rustbook}.
+Code \ref{code:structupdatesyntax} shows an example of the struct update syntax.
+
+
+\Needspace{15\baselineskip}
+\includecode[0.45]{rust}{ressources/code/namedtuplesyntax.rs}{Syntax of a tuple struct in Rust}{namedtuplesyntax}
+\subsection{Tuple Structs}
+Tuple structs are similar to named structs, but their values, called \textit{elements}, are unnamed.
+They can be used to group values of different types into a single type and give them meaning by naming the struct itself without naming the values individually.
+This can be used when the name of the struct and the order of the elements is enough to describe their meaning.
+For accessing the elements of a tuple struct, the \texttt{.} operator is used in the same way as for named structs, with the difference that the elements are addressed by their index instead of their name.
+This means that the order of the fields is important, and a tuple struct is, therefore, very similar to the tuple type \cite[Chapter~5.1]{rustbook} \cite[212-213]{Blandy_Jim2021-07-20}.
+Code \ref{code:namedtuplesyntax} shows the basic syntax of creating and accessing a tuple struct.
+If we would define another struct with the same fields as \texttt{Complex}, it would not be the same type, and attempting to compare them or use one of them where the other is expected would result in an error.
+
+
+\includecode[0.45]{rust}{ressources/code/unitstructsyntax.rs}{Syntax of a unit struct in Rust}{unitstructsyntax}
+\subsection{Unit Structs}
+A unit struct has no elements, holds no data, and therefore occupies no space in memory.
+To define a unit struct in Rust, the \texttt{struct} keyword is used, followed by the struct name and a semicolon, without enclosing curly braces.
+To instantiate a unit struct, the struct name is used.
+A unit struct can be helpful when working with \textit{traits}.
+Traits allow for the definition of shared behavior in an abstract way that is \textit{interfaces} in \Cpp.
+However, they will not be further elaborated on, as they are not within the scope of this paper \cite[213]{Blandy_Jim2021-07-20} \cite[Chapter~10.2]{rustbook}.
+
+
+\subsection{Functionality on Structs}
+After covering the fundamentals of structs in Rust, the following section will examine how to add functionality to structs.
+
+
+\Needspace{15\baselineskip}
+\includecode[0.55]{rust}{ressources/code/methodsyntax.rs}{Syntax of a method in Rust}{methodsyntax}
+\subsubsection{Methods}
+Methods are very similar to functions.
+They differ from functions in that they are associated with an instance of a struct.
+In order to implement a method for a struct, an \textit{implementation block} is used.
+The \texttt{impl} keyword, followed by the name of the struct, is used to define an implementation block.
+Methods can then be defined inside the curly braces of the implementation block.
+They are defined in the same way as functions, with a name, parameters, and a return type, but they are special functions in that they always take \texttt{self} as their first argument.
+Within an implementation block, \texttt{Self} is shorthand for the name of the struct the implementation block is for.
+Each method has to take either \texttt{self: Self}, \texttt{self: \&Self}, or \texttt{self: \&mut Self} as its first parameter.
+\texttt{self}, \texttt{\&self}, and \texttt{\&mut self} are then abbreviations for these three variables with their respective types.
+To access members of the struct within a method, \texttt{self} has to be used explicitly, followed by the \texttt{.} operator and the name of the field \cite[214-215]{Blandy_Jim2021-07-20}.
+Code \ref{code:methodsyntax} shows an example of implementing a method for a struct.
+Calling a method is done by using the \texttt{.} operator on an instance of the struct followed by the name of the method and the arguments in parentheses.
+
+
+\Needspace{15\baselineskip}
+\includecode{rust}{ressources/code/associatedfunctionsyntax.rs}{Syntax of an associated function in Rust}{associatedfunctionsyntax}
+\subsubsection{Associated Functions}
+Each function declared within an implementation block is called a \textit{type-associated function} or \textit{associated function} for short.
+These functions do not take \texttt{self} as their first argument and are, therefore, not associated with a specific instance and instead are associated with the type itself.
+They can be used like static functions in other languages.
+An associated function can be called using the \texttt{::} operator on the struct's name followed by the name of the function \cite[219-220]{Blandy_Jim2021-07-20}.
+Code \ref{code:associatedfunctionsyntax} shows an example of creating and calling an associated function.
+
+
+\subsection{Visibility of Structs}
+In Rust, by default, all fields, methods, and functions of a struct are private and can only be accessed within the same module.
+If a struct is marked as \texttt{pub}, it can be used from outside the module, but its fields, methods, and functions remain private.
+In order to access the fields of a struct from outside, each field that should be accessible has to be marked as \texttt{pub}.
+Private fields can still be accessed by functions and methods associated with the struct. Therefore, controlled access to private fields using functions and methods can be implemented.
+If at least one field of the struct is private, the default struct initialization will be private as well, as private fields cannot be accessed or initialized from outside, and Rust does not support partial initialization.
+Helper functions are then needed to create instances of the struct.
+Functions and methods can be marked as \texttt{pub} as well and can be accessed from outside the module, as long as the struct itself is marked as \texttt{pub} \cite[210-211]{Blandy_Jim2021-07-20} \cite[Chapter~7.3]{rustbook} \cite[Chapter~12.6]{rustref}.
+Appendix Code \ref{code:structvisibility} presents an example of a struct with public and a struct with private fields.
+
+
+\subsection{Comparison with \Cpp}
+The core concept of structs in Rust is to group data by creating a new type and the possibility to add functionality to this type.
+\Cpp has structs and classes that both serve the same purpose.
+The only difference between these two in \Cpp is that structs default to a public access level while classes default to a private access level.
+In Rust, all fields of a struct and the struct itself are private by default.
+Therefore, structs in Rust are in this aspect more similar to classes in \Cpp than to structs in \Cpp, but not equivalent as the concept of visibility slightly differs between Rust and \Cpp  \cite[187]{Blandy_Jim2021-07-20}.
+The syntax of structs in Rust is similar to that of structs in \Cpp, but there are some minor differences.
+Rust struct's functions and methods are defined within an \texttt{impl} block and are separated from the struct definition.
+This allows for keeping the data and the functionality of a struct visually separated.
+Furthermore, \texttt{impl} blocks are not limited to structs, and the separation allows for a more general and similar syntax for different concepts in Rust \cite[220]{Blandy_Jim2021-07-20}.
+In \Cpp, functions and methods can be defined within the struct definition.
+Traditionally, they are defined in a header file, while the implementation is provided in a separate source file, which allows for a similar separation \cite[30-33]{Stroustrup_Bjarne2022-09-24}.
+Another difference is that methods in Rust take \texttt{self} as their first argument, which is not the case in \Cpp.
+Inside a method, \Cpp allows for implicit access to the fields of the struct, while in Rust, \texttt{self} has to be used explicitly to access the fields.
+One key difference between the two languages is that classes/structs in \Cpp allow for inheritance, while structs in Rust do not but can implement \textit{traits} instead.
+This is an intentional design decision of the Rust language, but will not be covered, as it is not a focus of this paper.
+While classes/structs in \Cpp have implicit or explicit constructors, this is often done in Rust by implementing an associated function that returns an instance of the struct, as the language does not support constructors, as \Cpp does.
+Instead of implementing a destructor, as done in \Cpp, the \texttt{Drop} trait can be implemented along with a \texttt{drop} method that will be called when the instance of the struct goes out of scope.
+Rusts associated functions are very similar to static functions in \Cpp. While Rust does not have a direct equivalent to the static variables of a \Cpp class, Rust has \textit{associated consts} that can be defined within the given \texttt{impl} block \cite[220-221]{Blandy_Jim2021-07-20}.

@@ -1,0 +1,100 @@
+\section{Patterns and Control Flow}  \label{sec:patterns}
+As the previous section shows, Rust allows enums to hold various data types.
+The control flow construct \texttt{match} can be used to determine the current variant of an enum, access its associated data, and perform various actions accordingly.
+Looking at Code \ref{code:matchexample}, the syntax of \texttt{match} looks close to a \texttt{switch} statement in other languages would, as it takes an expression and then checks it against several \textit{patterns}.
+It is evaluated from top to bottom, and only the arm of the first pattern that matches the expression is executed.
+The body of such a match arm is an expression, and the value of the matching arm's expression is then returned as the value of the whole match expression.
+\includecode{rust}{ressources/code/matchexample.rs}{Example match expression \cite[Chapter~8.5]{rustbyexample}}{matchexample}
+
+
+\Needspace{3\baselineskip}
+\subsection{Matching Types of Patterns}
+The elements of a pattern can be deconstructed into one of the following groups: \textit{literals}, \textit{destructured arrays/enums/structs/tuples}, \textit{variables}, \textit{wildcards}, and \textit{rests} \cite[Chapter~18]{rustbook} \cite[Chapter~9]{rustref}.
+They will be covered in more detail in the following sections.
+
+\subsubsection{Literals, Variables, and Wildcards}
+Literals are the simplest form of patterns. They only match against a fixed value evaluated at compile time and are, for example, integers, chars, or booleans \cite[Chapter~8.2.1]{rustref}.
+Using only literals makes the \texttt{match} expression behave similarly to a \texttt{switch} statement.
+
+Using a variable as a pattern does not mean comparing the value of the variable against the value of the expression but instead binding the value of the expression to a newly created variable.
+This means that the variable will then hold the value of the expression, and therefore the original value might have been moved or copied, depending on the type of the expression.
+Variables bound by a pattern can be used inside the body of the matching arm and shadow variables of the same name in the outer scope.
+Code \ref{code:matchexample} shows an example where the value of \texttt{number} is bound to the variable \texttt{x} and then printed in the body of the matching arm.
+
+The wildcard pattern is an underscore \texttt{\_} and matches against any value. It differs from a variable in that it does not bind and therefore does not move or copy the given value \cite[Chapter~6.2, Chapter~18.3]{rustbook}.
+
+
+\subsubsection{Destructuring}
+Destructuring arrays, enums, structs, and tuples is a way of matching against the individual elements of these types.
+Using \texttt{let} statements, that take patterns as well, with the syntax \texttt{let pattern = expression}, makes it possible to assign multiple values at once by using destructuring.
+Function parameters take patterns as well, allowing the passed arguments to be destructured.
+When destructuring, the \textit{rest pattern} \texttt{..} can be used to match against remaining elements. This pattern is sometimes called \textit{wildcard} or \textit{wildcards} while the underscore \texttt{\_} is then called \textit{placeholder} \cite{oldrustrefmatchexpr}.
+It has to be unambiguous what the rest pattern matches against, and it can therefore only be used once in a pattern \cite[243-244]{Blandy_Jim2021-07-20} \cite[Chapter~18.3]{rustbook} \cite[Chapter~9]{rustref}.
+Appendix Code \ref{code:destructuringpattern} shows examples of destructuring and how the rest pattern can be used.
+
+
+\enlargethispage{2\baselineskip}
+\subsection{if let, while let and for Loops}
+\includecode{rust}{ressources/code/ifletwhileletfor.rs}{if let, while let and for loops}{ifletwhileletfor}
+\noindent \texttt{match} expressions must be exhaustive, which means that they have to cover all possible cases of the given expression.
+This has the advantage that the compiler can check if all cases are handled and warn if a case was forgotten \cite[Chapter~6.2]{rustbook}.
+Sometimes, only certain cases need to be handled and the rest can be ignored.
+A \texttt{match} expression could be used to check for all cases that need to be handled, and then the wildcard pattern~\texttt{\_} could act like a default case to ignore the rest, but this is not very concise.
+Rust provides the \texttt{if let} expression that allows checking for a single case and ignoring the rest or chaining multiple expressions together.
+The \texttt{if let} expression takes a pattern, followed by an equals sign and an expression. It checks if the pattern matches the expression and then executes the body if it does.
+Just like a match arm would, \texttt{if let} expressions introduce new local variables, shadowing variables of the same name in the outer scope, that can be used in the body.
+The \texttt{if let} expression can be followed by an \texttt{else} that acts like the \texttt{else} of an \texttt{if} expression would, but also allows for another \texttt{else if let} or \texttt{else if}.
+This gives more flexibility than a \texttt{match} expression would, as these expressions do not have to be related to each other and can use different patterns and expressions \cite[Chapter~6.3]{rustbook}.
+\texttt{while let} follows a very similar meaning to \texttt{if let}, in that it takes a pattern and an expression and executes the body as long as the pattern matches the expression.
+\texttt{for} loops also take patterns, which allows destructuring arrays, vectors, slices, and other types as part of the loop \cite[Chapter~18.1]{rustbook}.
+Code \ref{code:ifletwhileletfor} shows examples of \texttt{if let}, \texttt{while let}, and \texttt{for} loops.
+
+
+\subsection{Refutable and Irrefutable Patterns}
+Patterns can be categorized into two groups, \textit{refutable} and \textit{irrefutable}.
+An irrefutable pattern is a pattern that will always match, no matter what the expression is, and a refutable pattern, on the other hand, might not match the given expression.
+Whether a refutable or irrefutable pattern can be used depends on the context.
+As seen before, the \texttt{let} statement takes a pattern. In this case, only irrefutable patterns are allowed, as there is no logical way to handle a pattern that might not match.
+The same goes for \texttt{for} loops and function parameters.
+The \texttt{if let} and \texttt{while let} expressions allow for irrefutable patterns, but the compiler will give a warning, as these expressions are meant to handle patterns that might not match.
+The \texttt{match} expression allows for one irrefutable pattern used in the last arm, similar to a default case, but all other arms must be refutable \cite[142-144,250]{Blandy_Jim2021-07-20} \cite[Chapter~18.2]{rustbook}.
+
+
+\subsection{Matching multiple Patterns at once}
+\noindent Rust allows for matching against multiple patterns simultaneously by using the \texttt{|} operator and concatenating the patterns.
+This is useful if multiple different values should be matched against but then proceed in the same way.
+If an integer should be either 1, 2, or 3, the pattern \texttt{1~|~2~|~3} can be used, but Rust allows for an even more concise way of doing this.
+The \texttt{..=} operator can be used to match against a range of values.
+The pattern \texttt{1..=3} matches against all values between 1 and 3, including 1 and 3 \cite[248]{Blandy_Jim2021-07-20}.
+
+
+\needspace{15\baselineskip}
+\subsection{Refine Matches with Guards}
+\includecode{rust}{ressources/code/matchguard.rs}{Match guard}{matchguard}
+\noindent Sometimes, a match arm needs to check for something that cannot be expressed using only the patterns presented.
+In this case, a \textit{match guard} can be used, which is an additional \texttt{if} condition that must also be true for the arm to match.
+Earlier, it was shown that using a variable inside a pattern does not mean that the variable's value is matched against, but rather that the value of the expression is bound to the variable.
+Using a match guard allows comparing against the variable's value.
+Variables bound in the pattern can then be used in the match guard \cite[Chatper~8.2.16]{rustref}.
+Code \ref{code:matchguard} shows an example of a match guard.
+
+
+\subsection{@ Bindings}
+\noindent The \texttt{@} operator allows binding the value of a matched expression to a variable.
+By using \texttt{x @ pattern}, the pattern can be matched against, and on success, the value will be bound to \texttt{x}.
+This could, for example, be useful if a struct of a certain type should be checked for inside a given expression and then proceed using the given instance.
+Without the \texttt{@} operator, all the fields of the struct would have to be matched against, and then the struct has to be rebuilt with the given values.
+This is not always possible, as there might not be a way to construct a new instance from the given scope.
+Using the \texttt{@} operator, the struct can be matched against using the pattern \texttt{StructName(..)}, and then the variable that holds the struct can be used to proceed.
+Appendix Code \ref{code:atbinding} shows an example of how this can be used.
+Furthermore, it can be helpful when using ranges.
+If a number should be checked for being between 1 and 3, the pattern \texttt{x @ 1..=3} can be used, and then the variable \texttt{x} can be used to proceed \cite[248-249]{Blandy_Jim2021-07-20} \cite[Chapter~18.3]{rustbook}.
+
+
+\subsection{Comparison with \Cpp}
+\Cpp has a \texttt{switch} statement that is similar to the \texttt{match} expression and allows for matching against several different values \cite[178-179]{Lippman_Stanley_B_2012-08-06}.
+\texttt{switch} statements are limited to matching against a single value and do not allow for a system similar to Rust's patterns and additional features.
+\Cpp does not have a feature similar to Rust's patterns.
+Over recent years, features like \textit{structured bindings} that allow for destructuring have been added to \Cpp that make it easier to achieve similar results in some places \cite[41-42]{Stroustrup_Bjarne2014-05-15}.
+Appendix \ref{code:structuredbindings} shows how this can be used.
+There are currently proposals to add pattern matching to \Cpp \cite{p1371r3} \cite{p2392r1}, and similar features can be archived using external libraries \cite{mach7}. However, there is currently no counterpart to Rust's pattern matching in \Cpp.

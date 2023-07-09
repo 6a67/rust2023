@@ -1,0 +1,121 @@
+% !TeX options = --synctex=1 --interaction=nonstopmode --file-line-error -shell-escape "%DOC%"
+\documentclass[%
+    a4paper,                    % Paper format
+    12pt,                       % Fontsize
+    bibliography=totoc          % Include bibliography in table of contents
+]{scrartcl}                     % KOMA-Script article
+
+
+\usepackage[%
+    breaklinks=true,            % links survive linebreaks
+    colorlinks,                 % links get colored instead of boxes
+    linkcolor=black,            % influences table of contents and page numbers
+    urlcolor=black,             % color for urls
+    citecolor=black,
+    bookmarks,                  % creates bookmarks for pdf-viewer
+    bookmarksnumbered           % numbering of bookmarks
+]{hyperref}                     % package for internal links
+
+\usepackage[section]{minted}    % code formatting
+\usepackage{wrapfig}            % wrap text around figures
+\usepackage{caption}            % caption formatting
+\usepackage{xcolor}             % color definitions
+\usepackage{mdframed}           % frame around code
+\usepackage{float}              % float positioning
+\usepackage{scrhack}            % ignore warnings from listings package
+\usepackage{bookmark}           % fix for bookmark warning
+\usepackage[section]{placeins}  % prevent floats from floating into next section
+\usepackage{graphicx}           % include images
+\usepackage[en-IE]{datetime2}   % date format
+\usepackage[%
+    backend=biber,              % use bibtex as backend
+    urldate=iso,                % use iso date format for urls
+    seconds=true,               % display seconds in time stamps, needed for urldate
+    natbib=true,                % enable natbib compatibility
+    % style=ieee,               % use ieee style
+    sorting=none                % sort by appearance in document
+]{biblatex} % bibliography
+\usepackage{needspace}          % prevent page breaks in cod
+\usepackage{xr-hyper}
+
+\addbibresource{ressources/literatur.bib}
+
+% figure categories
+\newfloat{code}{htbp}{loc}[section]
+\DeclareCaptionLabelFormat{code}{Code #2} % set caption label format for code
+
+% set size of minted code font and gray background
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\setminted{fontsize=\footnotesize, bgcolor=bg}
+
+% Define a new command for including code in a wrapfigure
+\newcommand{\includecode}[5][0.51]{
+    \begin{wrapfigure}{R}{#1\textwidth}
+        \vspace{-20pt}
+        % mdframe with invisible border
+        \begin{mdframed}[linecolor=lightgray, linewidth=0pt, innertopmargin=5pt, innerbottommargin=5pt]
+            \inputminted{#2}{#3}
+        \end{mdframed}
+        % small caption and remove space between caption and text
+        \vspace{-20pt}
+        \captionsetup{font=footnotesize, labelformat=code}
+        % caption for code
+        \caption{#4}
+        % make label for code
+        \label{code:#5}
+        \vspace{-10pt}
+    \end{wrapfigure}
+}
+
+\newcommand{\includecodefigure}[5]{
+    \begin{figure}[htbp]
+        \centering
+        \begin{mdframed}[linecolor=lightgray]
+            \inputminted{#1}{#2}
+        \end{mdframed}
+        % small caption and remove space between caption and text
+        \vspace{-20pt}
+        \captionsetup{font=footnotesize, labelformat=code}
+        % caption for code
+        \caption{#3}
+        % make label for code
+        \label{code:#4}
+        % \vspace{-5pt}
+    \end{figure}
+}
+
+% better looking "C++" https://tex.stackexchange.com/a/4304
+\usepackage{relsize}
+\usepackage{xspace}
+\protected\def\Cpp{C\nolinebreak[4]\hspace{-.05em}\raisebox{.4ex}{\relsize{-3}{\textbf{++}}}\xspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\externaldocument[appendix-]{chapters/appendix}
+
+\begin{document}
+
+\input{chapters/titlepage.tex}
+\tableofcontents
+\clearpage
+
+\input{chapters/introduction.tex}
+\input{chapters/structs.tex}
+\input{chapters/enums.tex}
+\input{chapters/patterns.tex}
+\input{chapters/memorylayout.tex}
+\input{chapters/conclusion.tex}
+
+\clearpage
+
+\input{chapters/appendix.tex}
+
+\clearpage
+
+\listoffigures
+
+\clearpage
+
+\printbibliography
+
+\end{document}

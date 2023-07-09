@@ -1,0 +1,30 @@
+\section{Memory Layout}
+This section will briefly examine how Rust handles the memory layout of structs and enums.
+Both structs and enums have a \textit{representation} that defines how the data is laid out in memory.
+The \textit{representation} can be the \textit{default representation}, also called \textit{rust representation}, the \textit{C representation}, the \textit{primitive representation} or the, for us less important, \textit{transparent representation} \cite[Chapter~10.3]{rustref}.
+
+
+\subsection{Structs}
+Structs allow for the default representation and the C representation.
+The default representation is the default and guarantees that each field is properly aligned, that the fields do not overlap, and that the alignment of the struct itself is at least the same as the maximum alignment of its fields.
+The alignment defines that the address of the field is always a multiple of that alignment value.
+One thing to note is that this representation does not guarantee that the fields are laid out in the same order as defined in the struct or specify any order or padding.
+This might lead to added padding between fields, but depending on multiple factors, not necessarily.
+Furthermore, the compiler is free to reorder the fields in any way, which could be used for optimization purposes, as long as the guarantees are upheld.
+This makes it unsuitable for cases where the order and predefined addresses of the fields are important.
+The C representation is more appropriate in this case, as it follows the same rules as structs in C and \Cpp. This most notably means that the fields are laid out in the same order as defined in the struct \cite[308-310]{Stroustrup_Bjarne2014-05-15}.
+
+Rust allows us to specify \textit{alignment modifiers} that can specify that a struct should be \textit{packed}, which means that no additional padding is added between fields.
+This can also be done in \Cpp, using compiler directives.
+Changing the representation and packing of a struct is done by adding the \texttt{\#[repr()]} attribute to the struct's definition and specifying the representation as an argument (e.g., \texttt{packed}, \texttt{C}) in the round brackets \cite[213-214]{Blandy_Jim2021-07-20} \cite[Chapter~10.3]{rustref}.
+
+
+\subsection{Enums}
+Enums allow for the default representation, the C representation, and the primitive representation.
+The default and C representations are equivalent to the ones for structs, and the primitive representation can be combined with one of the other.
+Enums have an additional \textit{tag} field, which is used to identify which variant of the enum is currently stored.
+The tag field has to be at least the size of the smallest integer type that can hold all the variants of the enum and can be adjusted using the primitive representation by adding \texttt{\#[repr(u16)]}, \texttt{\#[repr(u32)]}, ... to the enum definition.
+The tag might then be followed by padding and by the data of the variant, just like in a struct.
+As Rust does not make any more guarantees in the default representation, as stated above, there is no guarantee of how the enum is laid out in memory by default.
+In general, its size is mostly the size of the tag field plus the size of the largest possible variant, including padding \cite[233-234]{Blandy_Jim2021-07-20}.
+Suppose the used variant is smaller than the largest possible variant. In that case, the enum will still take up the same amount of space as if the largest variant was used, and the additional space will be unused \cite[3.3 Enums]{rustunsafe} \cite[Chapter~10.3]{rustref}.

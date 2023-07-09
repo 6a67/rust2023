@@ -1,0 +1,54 @@
+\Needspace{15\baselineskip}
+\includecode{rust}{ressources/code/enumwithdata.rs}{Enum with data}{enumwithdata}
+\section{Enums}
+Enmus allow defining custom data types with a set of named values, called \textit{variants} \cite[230]{Blandy_Jim2021-07-20}.
+At any given time, a variable of this type can be exactly one of its variants.
+\noindent This makes enums a versatile tool for modeling multiple scenarios, from representing different states of an object to encoding different options for a function.
+A basic enum in Rust resembles a C-like enum and is defined by the \texttt{enum} keyword followed by the name of the enum and a list of variants.
+By default, the first variant has the value 0, the second one the value 1, and subsequent variants increment by one.
+\Needspace{10\baselineskip}
+\includecode[0.55]{rust}{ressources/code/enummethodsyntax.rs}{Syntax and functionality of enums}{enummethodsyntax}
+\noindent Each variant can be assigned a custom integer value that has to be unique.
+Casting from such an enum to an integer is possible, but the reverse is not, as Rust guarantees that the value of an enum is always a valid variant.
+\noindent In Rust, enums can optionally hold data.
+Each variant can be one of three types: a unit variant, a tuple variant, or a struct variant.
+The unit variant has no additional data associated with it, as seen in Code \ref{code:enummethodsyntax}.
+The tuple variant holds a tuple of values and is defined just like a tuple struct.
+The struct variant holds a named struct of values and is defined by a name followed by curly braces containing the fields of the struct, just like a named struct.
+These variants can then be used like their struct counterparts \cite[Chapter~6.7]{rustref} \cite[230-234]{Blandy_Jim2021-07-20}.
+Code \ref{code:enumwithdata} shows an example of an enum with data.
+
+
+\subsection{Functionality on Enums}
+Just like structs, enums can implement functionality. The syntax for implementing and using enum functionality is the same as for structs.
+The only difference is that an enum does not have fields but exactly one variant.
+This variant can be accessed using the \texttt{self} keyword \cite[Chapter~6.1]{rustbook}.
+Code \ref{code:enummethodsyntax} shows an example of such a method.
+
+
+\subsection{Result and Option}
+\includecode[0.35]{rust}{ressources/code/resultandoptionenum.rs}{Result and Option enums \cite{ruststdresult} \cite{ruststdoption}}{resultandoptionenum}
+\noindent Rust has two built-in enums often used, \texttt{Result} and \texttt{Option}, which will be briefly discussed as they show how enums can be used in practice.
+\texttt{Result} is a \textit{generic} enum that has two variants, \texttt{Ok} and \texttt{Err}.
+The \texttt{Ok} variant is used to signal that the operation was successful and holds the result of the operation, while the \texttt{Err} variant is used to signal that the operation failed and holds an error message.
+\texttt{Option} is also a \textit{generic} enum that has two variants, \texttt{Some} and \texttt{None}.
+Contrary to many other languages, Rust does not have a \texttt{null} value but instead uses \texttt{Option} to represent the absence of a value.
+The \texttt{Some} variant holds the value, while the \texttt{None} variant is used to signal that there is no value.
+This makes it similar to a value that can be \texttt{null} in other languages or pointers that can be \texttt{nullptr} in \Cpp.
+Unlike \Cpp, Rust forces to check whether a value is present before using it.
+This has the advantage that there will not be null pointer dereferences at runtime, and only variables of type \texttt{Option} have to be checked for \texttt{None}, as other accesses are guaranteed to be safe \cite[236-237]{Blandy_Jim2021-07-20} \cite[Chapter~6.1]{rustbook}.
+The \nameref{sec:patterns} section will show how the data within enums can be accessed.
+Similar to Rust's \texttt{Option}, \Cpp has a \texttt{std::optional} type that can be used to represent that a value might not be present.
+It can be checked if a value is present using the \texttt{has\_value()} method and accessed using the \texttt{value()} method, which will throw an exception if the value is not present.
+As the \texttt{std::optional} type exists in addition to pointers that can be \texttt{nullptr}, it does not have the same advantages as Rust's \texttt{Option} type \cite{stdoptional}.
+
+
+\subsection{Comparison with \Cpp}
+The fundamental concept of enums in Rust and \Cpp is mostly the same, but some differences exist.
+In \Cpp, enums can hold other types than integers by changing the underlying type of how the enum is stored.
+They are limited to \textit{integral types}, which means that enums can represent, for example, a \texttt{char} or a \texttt{short}, but not a \texttt{float} or a \texttt{double} \cite[32, 834]{Lippman_Stanley_B_2012-08-06}.
+Rust enums can hold any type of data and even different types in different variants.
+Furthermore, enums in Rust can implement functionality, while enums in \Cpp cannot.
+Enums in Rust are more powerful than they are in \Cpp, as they extend on the basic functionality of enums in \Cpp, but this does not mean that \Cpp cannot achieve similar behavior.
+\Cpp, for example, has the \texttt{std::variant} type, which can hold one of a fixed set of types.
+Appendix \ref{code:variantenums} shows how \texttt{std::variant} can be used to achieve a very similar behavior to Rust's enums that hold data \cite[209-210]{Stroustrup_Bjarne2022-09-24}.
